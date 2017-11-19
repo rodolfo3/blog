@@ -5,9 +5,399 @@
     <description></description>
     <link>http://blog.rodolfo.pro.br/</link>
     <atom:link href="http://blog.rodolfo.pro.br/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 19 Nov 2017 20:16:27 -0200</pubDate>
-    <lastBuildDate>Sun, 19 Nov 2017 20:16:27 -0200</lastBuildDate>
+    <pubDate>Sun, 19 Nov 2017 20:18:31 -0200</pubDate>
+    <lastBuildDate>Sun, 19 Nov 2017 20:18:31 -0200</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
+    
+      <item>
+        <title>React Components</title>
+        <description>&lt;h1 id=&quot;component-classifications&quot;&gt;Component classifications&lt;/h1&gt;
+
+&lt;p&gt;[TOC]&lt;/p&gt;
+
+&lt;h2 id=&quot;by-state-usage&quot;&gt;by state usage&lt;/h2&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Stateful
+Keep state internally and changes it&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Example:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;class Button extends Component {
+	state = {
+		count: 0
+	}
+	inc = () =&amp;gt; {
+		this.setState((s) =&amp;gt; { count: s.count + 1 })
+	}
+	
+	render() {
+		&amp;lt;button onClick={this.inc}&amp;gt;
+			{ this.state.count }
+		&amp;lt;/button&amp;gt;
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Stateless
+Only based on props (values and callbacks)&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Usually pure functons&lt;/p&gt;
+
+&lt;p&gt;Example:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;const Button = ({children, onClick}) =&amp;gt; (
+	&amp;lt;button onClick={onClick}&amp;gt;
+		{children}
+	&amp;lt;/button&amp;gt;
+);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Stateless components are usually to reuse and test.
+But stateful components are powerful.&lt;/p&gt;
+
+&lt;h2 id=&quot;by-goal&quot;&gt;By goal&lt;/h2&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Presentional
+Generate the VirtualDom to show the content by the received props.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Are free of dependencies from the rest of the app (only depends on props and it’s own state)&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Container
+Responsible to reach data that lives outside react scope (like redux store)&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&quot;A container does data fetching and then renders it&#39;s corresponding sub-component. That&#39;s it.&quot;
+Jason Bonta Usually have a `render` method just calling a presentional component.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;how-do-we-make-sure-components-are-reusable&quot;&gt;How do we make sure components are reusable?&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;by ensuring out UI components are pure presentional components (dumb)
+What does that means?
+ – no data fetch into component
+ – if we have &lt;code class=&quot;highlighter-rouge&quot;&gt;renderBla()&lt;/code&gt; functions in the component, it’s better move it to separate components&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Single Responsibility Principle
+– Components/Containers should deal with only one chunk of the UI feature/functionality&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;“if in doubt, create another component”&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;some-useful-patterns&quot;&gt;Some useful patterns&lt;/h1&gt;
+
+&lt;h2 id=&quot;hoc-high-order-components&quot;&gt;HOC (high-order-components)&lt;/h2&gt;
+&lt;p&gt;A function that takes a component as argument and returns a new component.
+Allows apply logic to components without coding it as a dependency
+Real-world examples:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;connect (from redux)&lt;/li&gt;
+  &lt;li&gt;withRouter (from ReactRouter)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The code looks like:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;export const withActions = acts =&amp;gt; OriginalComponent =&amp;gt; {
+	class WithActioncComponent extends Component {
+		render() {
+			return (
+				&amp;lt;OriginalComponent
+					extra={someData}
+					{...this.props}
+				/&amp;gt;
+			);
+		}
+	}
+	return WithActioncComponent;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Them the usage is like:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;const NewComponent = withActions(acts)(OriginalComponent);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;render-callbacks-function-as-a-child-components&quot;&gt;render callbacks (function as a child components)&lt;/h2&gt;
+&lt;p&gt;“Children is literally just a JavaScript function.”
+Separate state manipulation (state and callbacks) from the “render”.&lt;/p&gt;
+
+&lt;p&gt;The parent component is like&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;const Component = ({ children }) =&amp;gt; {
+	return (
+		&amp;lt;strong&amp;gt;
+			{ children({ count, callback }) }
+		&amp;lt;/strong&amp;gt;
+	);
+};
+
+Component.propTypes = {
+  children: React.PropTypes.func.isRequired,
+};
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;And, the usage, is like:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;Component&amp;gt;
+	{ (count, callback) =&amp;gt; 
+		&amp;lt;button onClick={callback}&amp;gt;
+			{ count + 1 }
+		&amp;lt;/button&amp;gt;
+	}
+&amp;lt;/Component&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;render-callbacks-x-hoc&quot;&gt;render callbacks x HOC&lt;/h2&gt;
+
+&lt;p&gt;Function as Child Component is a better alternative for abstracting your UI concerns with the exception that your child component is truly coupled to the Higher Order Component it is composed with.&lt;/p&gt;
+
+&lt;p&gt;https://medium.com/merrickchristensen/function-as-child-components-5f3920a9ace9&lt;/p&gt;
+
+&lt;h2 id=&quot;children-pass-through&quot;&gt;Children pass-through&lt;/h2&gt;
+&lt;p&gt;Do not include extra markup to component, just render the children:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;class MyComponent extends Component {
+	... 
+	render() {
+		return React.Children.only(this.props.children);
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Useful to add context (&lt;code class=&quot;highlighter-rouge&quot;&gt;getChildContext&lt;/code&gt;) and/or for HOC.&lt;/p&gt;
+
+&lt;h2 id=&quot;style-component&quot;&gt;Style component&lt;/h2&gt;
+&lt;p&gt;Create a specialized component just to style it (using an special property or even &lt;code class=&quot;highlighter-rouge&quot;&gt;className&lt;/code&gt;):&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;const Btn = ({ children, primary = false }) =&amp;gt; (
+	&amp;lt;button
+		className={primary ? &#39;primary&#39; : &#39;secondary&#39;}&amp;gt;
+		{ children }
+	&amp;lt;/button&amp;gt;
+); 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;And, then, use a style component, instead of an extra property:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;const PrimaryBtn = props =&amp;gt; &amp;lt;Btn {...props} primary /&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;layout-component&quot;&gt;Layout component&lt;/h2&gt;
+&lt;p&gt;A component that never updates - it exists only to layout things (like a fixed sidebar or a footer).
+It is a standard component where &lt;code class=&quot;highlighter-rouge&quot;&gt;shouldComponentUpdate&lt;/code&gt; always returns &lt;code class=&quot;highlighter-rouge&quot;&gt;false&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;components-for-formatting-text&quot;&gt;Components for formatting text&lt;/h2&gt;
+&lt;p&gt;Instead of use helpers to format text (like from &lt;code class=&quot;highlighter-rouge&quot;&gt;30&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;R$ 30,00&lt;/code&gt;), use a component:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;Money&amp;gt;30&amp;lt;/Money&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;With the code:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;const Money = ({ children }) =&amp;gt; (
+	&amp;lt;span&amp;gt;R$ {children.toLocaleString(&#39;en&#39;)}&amp;lt;/span&amp;gt;
+);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;context-wrapper&quot;&gt;Context Wrapper&lt;/h2&gt;
+&lt;p&gt;Context allows to send data/objects to inner components without send it as props.
+But is a good practice use HOC to inject it.
+ref.: &lt;code class=&quot;highlighter-rouge&quot;&gt;getChildContext&lt;/code&gt; &amp;amp; &lt;code class=&quot;highlighter-rouge&quot;&gt;childContextTypes&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Use-case: our player (send play, pause, etc methods)
+Others use-case: redux &lt;code class=&quot;highlighter-rouge&quot;&gt;dispatch&lt;/code&gt; and react-router &lt;code class=&quot;highlighter-rouge&quot;&gt;route&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Into the parent component:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;getChildContext() {
+	return {
+		addToShelf: this.addToShelf,
+		getShelf: this.getShelf,
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Into the child component:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Book.contextTypes = {
+	addToShelf: PropTypes.func,
+	getShelf: PropTypes.func,
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;class-properties&quot;&gt;Class Properties&lt;/h2&gt;
+&lt;p&gt;Configuring &lt;code class=&quot;highlighter-rouge&quot;&gt;class-properties&lt;/code&gt; into Babel allows initialize &lt;code class=&quot;highlighter-rouge&quot;&gt;state&lt;/code&gt; outside the &lt;code class=&quot;highlighter-rouge&quot;&gt;constructor&lt;/code&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;From
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;class MyNiceComponent extends Component {
+constructor() {
+  this.state = {
+    initialState: &#39;ok&#39;,
+  };
+}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;To
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;class MyNiceComponent extends Component {
+state = {
+   initialState: &#39;ok&#39;,
+}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This also avoids the usage of &lt;code class=&quot;highlighter-rouge&quot;&gt;bind&lt;/code&gt; in methods to allow use the &lt;code class=&quot;highlighter-rouge&quot;&gt;this&lt;/code&gt;
+variable:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;From
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;class MyNiceComponent extends Component {
+constructor() {
+  this.magic = this.magic.bind(this);
+}
+
+magic() {
+  // I can use &quot;this&quot;!
+}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;To
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;class MyNiceComponent extends Component {
+magic = () =&amp;gt; {
+  // I can use &quot;this&quot;!
+}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;naming-convention-for-event-handlers&quot;&gt;Naming convention (for event handlers)&lt;/h2&gt;
+&lt;p&gt;Pattern:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;handle{eventName}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Example:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;handleClick = (e) =&amp;gt; {
+	// code
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;send-render-as-a-prop&quot;&gt;Send render as a prop&lt;/h2&gt;
+&lt;p&gt;If we separate container and presentional components, it will be hard to put inner container inside presentional components. (Like &lt;code class=&quot;highlighter-rouge&quot;&gt;CourseCard&lt;/code&gt;, that includes the &lt;code class=&quot;highlighter-rouge&quot;&gt;FavoriteButton&lt;/code&gt;).&lt;/p&gt;
+
+&lt;p&gt;To solve that, the &lt;code class=&quot;highlighter-rouge&quot;&gt;CourseCard&lt;/code&gt; could receive a property with the component:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;const CourseCard = ({ name, etc, favoriteButton }) =&amp;gt; (
+	&amp;lt;div&amp;gt;
+	   ... code ...
+	   &amp;lt;div className=&quot;favorite-container&quot;&amp;gt;
+		   { favoriteButton }
+	   &amp;lt;/div&amp;gt;
+	&amp;lt;/div&amp;gt;
+); 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Then, &lt;code class=&quot;highlighter-rouge&quot;&gt;favoriteButton&lt;/code&gt; could be any react component.
+Alternatively, it could be a function (like &lt;code class=&quot;highlighter-rouge&quot;&gt;children&lt;/code&gt; when it is a function):&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;const CourseCard = ({ name, id, favoriteButton }) =&amp;gt; (
+	&amp;lt;div&amp;gt;
+	   … code …
+	   &amp;lt;div className=&quot;favorite-container&quot;&amp;gt;
+		   { favoriteButton({ courseId: id }) }
+	   &amp;lt;/div&amp;gt;
+	&amp;lt;/div&amp;gt;
+);&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Now, `favoriteButton` should be a render-like `function` instead of a component.
+
+It could also be a component class (or function):
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   &amp;lt;div className=&quot;favorite-container&quot;&amp;gt;
+	   &amp;lt;FavoriteButton courseId={id} /&amp;gt;
+   &amp;lt;/div&amp;gt; ```
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h1 id=&quot;more-props-x-objects-as-props&quot;&gt;More props x Objects as props&lt;/h1&gt;
+&lt;p&gt;React allows to pass objects as props to components. It also provides &lt;code class=&quot;highlighter-rouge&quot;&gt;propTypes&lt;/code&gt; to document (and validate) component usage.
+So, we could send props in 2 ways: full object or spread props&lt;/p&gt;
+
+&lt;h2 id=&quot;full-object&quot;&gt;full object&lt;/h2&gt;
+&lt;p&gt;Looks like a component that receive the object as props:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;BookCover book={book} /&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Then, it can validates using &lt;code class=&quot;highlighter-rouge&quot;&gt;shape&lt;/code&gt; :&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;BookCover.propTypes = {
+	book: PropTypes.shape({
+	    title: PropTypes.string,
+	    coverSrc: PropTypes.string
+	})
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;spread-props&quot;&gt;spread props&lt;/h2&gt;
+&lt;p&gt;The component receives each attribute as separated prop:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;BookCover title={book.title} coverSrc={book.coverSrc} /&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Then, the props validation will be like:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;BookCover.propTypes = {
+	title: PropTypes.string,
+	coverSrc: PropTypes.string,
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;This can use the spread operator:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;BookCover {...book} /&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h2 id=&quot;so-what&quot;&gt;so what&lt;/h2&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Sending full objects allows pass-through objects to inner components.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;But&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Sending separated props are easier to read, test and describes the component with the code&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Opinion: send objects to containers (extracted from &lt;code class=&quot;highlighter-rouge&quot;&gt;store&lt;/code&gt;), but send props to presentional components.&lt;/p&gt;
+
+&lt;h2 id=&quot;setstate-is-async&quot;&gt;setState is async&lt;/h2&gt;
+&lt;p&gt;Call &lt;code class=&quot;highlighter-rouge&quot;&gt;setState&lt;/code&gt;  do not modify &lt;code class=&quot;highlighter-rouge&quot;&gt;this.state&lt;/code&gt; synchronously: it enqueue the change to react apply at the end. Then:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;this.state = { count: 0 }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;this.setState({ count: this.state.count + 1 });
+this.setState({ count: this.state.count + 1 });
+this.setState({ count: this.state.count + 1 });
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;After this, into the &lt;code class=&quot;highlighter-rouge&quot;&gt;render&lt;/code&gt; method, &lt;code class=&quot;highlighter-rouge&quot;&gt;this.state.count&lt;/code&gt; is… &lt;code class=&quot;highlighter-rouge&quot;&gt;1&lt;/code&gt;, not &lt;code class=&quot;highlighter-rouge&quot;&gt;3&lt;/code&gt;.&lt;/p&gt;
+&lt;h2 id=&quot;use-setstate-callback&quot;&gt;use setState callback&lt;/h2&gt;
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;setState&lt;/code&gt; has a second parameter: a callback that runs after the state changes.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;this.setState({ count: 2 }, () =&amp;gt; {
+	console.log(&#39;state updated!&#39;);
+})
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h2 id=&quot;use-a-function-to-change-the-state&quot;&gt;use a function to change the state&lt;/h2&gt;
+&lt;p&gt;More useful to solve that initial use case (change state 3 times):&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;this.setState((state) =&amp;gt; ({
+	count: state.count + 1
+});
+this.setState((state) =&amp;gt; ({
+	count: state.count + 1
+});
+this.setState((state) =&amp;gt; ({
+	count: state.count + 1
+});
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;This will handle and the new &lt;code class=&quot;highlighter-rouge&quot;&gt;this.state.count&lt;/code&gt; will be &lt;code class=&quot;highlighter-rouge&quot;&gt;3&lt;/code&gt;, as expected.&lt;/p&gt;
+
+&lt;h1 id=&quot;performande&quot;&gt;Performande&lt;/h1&gt;
+&lt;p&gt;Don’t fret about performance optimizations until you have problems.&lt;/p&gt;
+
+&lt;h2 id=&quot;shouldcomponentupdate&quot;&gt;shouldComponentUpdate&lt;/h2&gt;
+&lt;p&gt;If the render method is expensive, is possible to implement the &lt;code class=&quot;highlighter-rouge&quot;&gt;shouldComponentUpdate&lt;/code&gt; method. It receive the new &lt;code class=&quot;highlighter-rouge&quot;&gt;props&lt;/code&gt; and it only runs &lt;code class=&quot;highlighter-rouge&quot;&gt;render&lt;/code&gt; if it returns &lt;code class=&quot;highlighter-rouge&quot;&gt;true&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;purecomponent&quot;&gt;PureComponent&lt;/h2&gt;
+&lt;p&gt;Extends &lt;code class=&quot;highlighter-rouge&quot;&gt;PureComponent&lt;/code&gt; will avoid component re-render if the &lt;code class=&quot;highlighter-rouge&quot;&gt;props&lt;/code&gt; are equal. It just improves the performance if the component do not change.
+It is implemented by react using &lt;code class=&quot;highlighter-rouge&quot;&gt;shouldComponentUpdate&lt;/code&gt;
+Use it into components that change could have a performance penalty: it will compare things twice: the &lt;code class=&quot;highlighter-rouge&quot;&gt;props&lt;/code&gt; and also the new virtualDOM (returned by &lt;code class=&quot;highlighter-rouge&quot;&gt;render&lt;/code&gt;).&lt;/p&gt;
+
+</description>
+        <pubDate>Sun, 19 Nov 2017 00:00:00 -0200</pubDate>
+        <link>http://blog.rodolfo.pro.br/2017/11/19/react-components.html</link>
+        <guid isPermaLink="true">http://blog.rodolfo.pro.br/2017/11/19/react-components.html</guid>
+        
+        
+      </item>
     
   </channel>
 </rss>
